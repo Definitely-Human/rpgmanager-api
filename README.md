@@ -1,2 +1,2 @@
-# rpgmanager-api
-A Django RestFramework API for rpgmanager.
+# RpgManager API
+A Django RestFramework API for RpgManager.
