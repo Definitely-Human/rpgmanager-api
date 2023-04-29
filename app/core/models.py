@@ -14,9 +14,10 @@ from django.utils import timezone
 class UserManager(BaseUserManager):
     """Manager for users"""
 
-    def create_user(self, email, password=None, **extra_fields):
-        """Create, save and return a new user."""
-        user = self.model(email=email,**extra_fields)
+    def create_user(self, email, username, password=None, **extra_fields):
+        """Create, save and return a new user. """
+        email = self.normalize_email(email)
+        user = self.model(email=email,username = username, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
 
