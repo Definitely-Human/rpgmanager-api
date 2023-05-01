@@ -134,7 +134,7 @@ class PrivateUserTests(TestCase):
         self.user = create_user(
             email='test@example.com',
             password='testpass123',
-            name='Testname',
+            username='Testname',
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
@@ -145,7 +145,7 @@ class PrivateUserTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, {
-            'username': self.user.name,
+            'username': self.user.username,
             'email': self.user.email,
         })
 
@@ -162,6 +162,6 @@ class PrivateUserTests(TestCase):
         res = self.client.patch(ME_URL, payload)
 
         self.user.refresh_from_db()
-        self.assertEqual(self.user.name, payload['username'])
+        self.assertEqual(self.user.username, payload['username'])
         self.assertTrue(self.user.check_password(payload['password']))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
