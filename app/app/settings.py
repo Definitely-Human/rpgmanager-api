@@ -38,9 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
+    # Third party packages
     'rest_framework',
     'drf_spectacular',
+    # RPG Manager apps
+    'core',
+    'user',
 ]
 
 MIDDLEWARE = [
