@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_spectacular',
     # RPG Manager apps
-    'core',
-    'user',
+    'djangoapps.core',
+    'djangoapps.user',
 ]
 
 MIDDLEWARE = [
