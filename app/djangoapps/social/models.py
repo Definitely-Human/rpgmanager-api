@@ -4,6 +4,8 @@ Models for social app.
 
 from django.db import models
 from django.conf import settings
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 
 class Profile(models.Model):
@@ -20,8 +22,6 @@ class Profile(models.Model):
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"
 
-from django.dispatch import receiver
-from django.db.models.signals import post_save
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def user_created_add_profile(sender, instance, created, *args, **kwargs):
@@ -32,4 +32,6 @@ def user_created_add_profile(sender, instance, created, *args, **kwargs):
     """
     if not created:
         return
-    instance.profile = Profile.objects.create(user=instance,first_name = instance.username)
+    instance.profile = Profile.objects.create(
+        user=instance,
+        first_name=instance.username)

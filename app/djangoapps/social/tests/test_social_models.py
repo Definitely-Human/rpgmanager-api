@@ -6,6 +6,7 @@ from django.test import TestCase
 from djangoapps.social import models
 from django.contrib.auth import get_user_model
 
+
 class SocialModelTests(TestCase):
     """Test social models."""
 
