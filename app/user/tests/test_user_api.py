@@ -20,6 +20,7 @@ def create_user(**params):
     """Create and return a new user."""
     return get_user_model().objects.create_user(**params)
 
+
 class PublicUserApiTests(TestCase):
     """Test the public features of the user API."""
 
@@ -107,7 +108,7 @@ class PublicUserApiTests(TestCase):
                     password='goodpass',
                     username='Testname',)
 
-        payload = {'username': 'test@example.com','password':'badpass'}
+        payload = {'username': 'test@example.com', 'password': 'badpass'}
         res = self.client.post(TOKEN_URL, payload)
 
         self.assertNotIn('token', res.data)
@@ -126,6 +127,7 @@ class PublicUserApiTests(TestCase):
         res = self.client.get(ME_URL)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class PrivateUserTests(TestCase):
     """Test API requests that require authentication"""
