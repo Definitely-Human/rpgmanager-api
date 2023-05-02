@@ -19,4 +19,4 @@ class SocialModelTests(TestCase):
             username=username,
             password=password
         )
-        self.assertIsInstance(user.profile, Profile)
+        self.assertIsInstance(user.profile, models.Profile)

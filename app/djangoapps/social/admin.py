@@ -1,3 +1,5 @@
 from django.contrib import admin
+from djangoapps.social import models as socialModels
 
-# Register your models here.
+
+admin.site.register(socialModels.Profile)
