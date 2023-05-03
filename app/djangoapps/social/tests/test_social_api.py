@@ -13,10 +13,10 @@ from djangoapps.social.models import Profile
 from djangoapps.social.serializers import ProfileSerializer
 
 
-OWN_PROFILE_URL = reverse("social:profile")
+OWN_PROFILE_URL = reverse("social:profile-list")
 
 
-class PublicProfileAPITests(TestsCase):
+class PublicProfileAPITests(TestCase):
     """Test unauthenticated API requests."""
 
     def setUp(self):
@@ -39,13 +39,15 @@ class PrivateProfileAPITests(TestCase):
             password="testpass123",
             username="testuser",
         )
-        user.profile.first_name = "Testfirstname"
-        user.profile.last_name = "Testlastname"
-        user.profile.save()
+        self.user.profile.first_name = "Testfirstname"
+        self.user.profile.last_name = "Testlastname"
+        self.user.profile.save()
         self.client.force_authenticate(self.user)
 
     def test_retrieve_own_profile(self):
         """Test retrieving own profile when authenticated."""
         res = self.client.get(OWN_PROFILE_URL)
+        serializer = ProfileSerializer(self.user.profile)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
