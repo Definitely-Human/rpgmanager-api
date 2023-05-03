@@ -20,7 +20,28 @@ class ProfileViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        """Get profile for the current user."""
-        profile = get_object_or_404(self.queryset, pk=request.user.id)
+        """Get profile for the current user.
+        Does not return list despite its name.
+        """
+        profile = get_object_or_404(self.queryset, pk=request.user.profile.id)
         serializer_class = serializers.ProfileSerializer(profile)
         return Response(serializer_class.data)
+
+    def retrieve(self, request, pk=None):
+        """Get profile for OTHER user."""
+        profile = get_object_or_404(self.queryset, pk=pk)
+        serializer_class = serializers.ProfileSerializer(profile)
+        return Response(serializer_class.data)
+
+    def partial_update(self, request, pk=None):
+        """Update user profile."""
+        if request.user.id != get_object_or_404(self.queryset, pk=pk).user.id:
+            return Response(status=403)
+        profile = Profile.objects.get(pk=pk)
+        serializer = serializers.ProfileSerializer(
+            profile, data=request.data, partial=True
+        )  # set partial=True to update a data partially
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=201, data=serializer.data)
+        return Response(status=400, data="wrong parameters")
