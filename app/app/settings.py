@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # RPG Manager apps
     'djangoapps.core',
     'djangoapps.user',
+    'djangoapps.social',
 ]
 
 MIDDLEWARE = [
