@@ -1,3 +1,19 @@
-from django.db import models  # noqa
+"""Models for RPG app."""
 
-# Create your models here.
+from django.db import models
+from django.conf import settings
+from django.utils import timezone
+from django.core.validators import MinValueValidator
+
+
+class Character(models.Model):
+    """Model representing the character of the user."""
+
+    name = models.CharField(max_length=100)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    character_xp = models.IntegerField(validators=[MinValueValidator])
+    coins = models.IntegerField()
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self) -> str:
+        return self.name
