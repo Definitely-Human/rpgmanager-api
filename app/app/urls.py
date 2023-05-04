@@ -33,4 +33,5 @@ urlpatterns = [
     ),
     path("api/user/", include("djangoapps.user.urls")),
     path("api/social/", include("djangoapps.social.urls")),
+    path("api/rpg/", include("djangoapps.rpg.urls")),
 ]

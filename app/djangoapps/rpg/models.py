@@ -11,8 +11,8 @@ class Character(models.Model):
 
     name = models.CharField(max_length=100)
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    character_xp = models.IntegerField(validators=[MinValueValidator])
-    coins = models.IntegerField()
+    character_xp = models.IntegerField(validators=[MinValueValidator], default=0)
+    coins = models.IntegerField(default=0)
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self) -> str:
