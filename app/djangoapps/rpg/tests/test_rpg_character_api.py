@@ -19,7 +19,11 @@ def detail_url(char_id):
     return reverse("rpg:character-detail", args=[char_id])
 
 
-def create_user(email="user@example.com", password="testpass123", username="user"):
+def create_user(
+    email="user@example.com",
+    password="testpass123",
+    username="user",
+):
     """Create and return user."""
     return get_user_model().objects.create_user(
         email=email, password=password, username=username
@@ -50,7 +54,8 @@ class PrivateRPGCharacterAPITests(TestCase):
     def test_retrieve_character(self):
         """Test retrieving list of characters."""
         Character.objects.create(user=self.user, name="Bob")
-
+        secondUser = create_user(email="user2@example.com", username="user2")
+        Character.objects.create(user=secondUser, name="Rob")
         res = self.client.get(CHARACTER_URL)
 
         characters = Character.objects.all().order_by("name")
@@ -73,3 +78,27 @@ class PrivateRPGCharacterAPITests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         character.refresh_from_db()
         self.assertEqual(character.name, payload["name"])
+
+    def test_delete_character(self):
+        """Test deleting a character."""
+        character = Character.objects.create(user=self.user, name="Bob")
+
+        url = detail_url(character.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        character = Character.objects.filter(user=self.user)
+        self.assertFalse(character.exists())
+
+    def test_create_character(self):
+        """Test creating a character."""
+        payload = {
+            "name": "Bob",
+            "character_xp": 5,
+        }
+
+        res = self.client.post(CHARACTER_URL, payload)
+        character = Character.objects.get(id=res.data["id"])
+        for k, v in payload.items():
+            self.assertEqual(getattr(character, k), v)
+        self.assertEqual(self.user, character.user)

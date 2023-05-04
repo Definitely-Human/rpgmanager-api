@@ -2,10 +2,7 @@
 Views for the RPG app APIs.
 """
 
-from rest_framework import (
-    viewsets,
-    mixins,
-)
+from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
@@ -26,3 +23,7 @@ class CharacterViewSet(viewsets.ModelViewSet):
         if self.action == "list" or self.action == "retrieve":
             return self.queryset.order_by("name")
         return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """Create a new character."""
+        serializer.save(user=self.request.user)

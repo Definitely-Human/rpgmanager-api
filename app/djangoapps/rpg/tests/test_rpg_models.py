@@ -27,8 +27,11 @@ class RPGModelTests(TestCase):
             password="testpass",
             username="testuser",
         )
-        character = models.Character.objects.create(user=user, name="Bob")
+        models.Character.objects.create(user=user, name="Bob")
 
         self.assertRaises(
-            IntegrityError, models.Character.objects.create, user=user, name="Tom"
+            IntegrityError,
+            models.Character.objects.create,
+            user=user,
+            name="Tom",
         )
