@@ -15,11 +15,15 @@ class Character(models.Model):
         on_delete=models.CASCADE,
     )
     character_xp = models.IntegerField(
-        validators=[MinValueValidator],
+        validators=[
+            MinValueValidator
+        ],  # TODO change to PositiveBigIntegerField
         default=0,
     )
     coins = models.IntegerField(default=0)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(
+        default=timezone.now
+    )  # TODO change default to auto_now_add
 
     def __str__(self) -> str:
         return self.name
