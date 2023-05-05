@@ -136,10 +136,8 @@ class PrivateRPGCharacterAPITests(TestCase):
         """Test user can't change their xp and coins."""
         character = Character.objects.create(user=self.user, name="Bob")
 
-        res = self.client.patch(detail_url(character.id), {"coins": 999})
-        res = self.client.patch(
-            detail_url(character.id), {"character_xp": 999}
-        )
+        self.client.patch(detail_url(character.id), {"coins": 999})
+        self.client.patch(detail_url(character.id), {"character_xp": 999})
 
         character.refresh_from_db()
         self.assertEqual(character.coins, 0)
