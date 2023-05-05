@@ -122,3 +122,53 @@ class PrivateManagerTaskAPITests(TestCase):
         for k, v in payload.items():
             self.assertEqual(getattr(task, k), v)
         self.assertEqual(task.character, self.character)
+
+    def test_partial_update(self):
+        """Test updating task using PATCH method."""
+        originalContent = "Eat a lot"
+        task = create_task(self.character, content=originalContent)
+
+        payload = {"title": "Eat food"}
+        url = detail_url(task.id)
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        task.refresh_from_db()
+
+        self.assertEqual(task.title, payload["title"])
+        self.assertEqual(task.content, originalContent)
+
+    def test_update_character_returns_error(self):
+        """Test trying to update character on the task returns error."""
+        secondUser = create_user(email="user2@example.com", username="user2")
+        secondChar = create_character(secondUser)
+        task = create_task(self.character)
+
+        payload = {"character": secondChar.id}
+        url = detail_url(task.id)
+        self.client.patch(url, payload)
+
+        task.refresh_from_db()
+        self.assertEqual(task.character, self.character)
+
+    def test_delete_task_successful(self):
+        """Test deleting task is successful."""
+        task = Task.objects.create(character=self.character)
+
+        url = detail_url(task.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Task.objects.filter(id=task.id).exists())
+
+    def test_delete_other_character_task_error(self):
+        """Test deleting other characters task creates error."""
+        secondUser = create_user(email="user2@example.com", username="user2")
+        secondChar = create_character(secondUser)
+        task = create_task(secondChar)
+
+        url = detail_url(task.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(Task.objects.filter(id=task.id).exists())
