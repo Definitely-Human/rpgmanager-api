@@ -1,3 +1,5 @@
-from django.contrib import admin  # noqa
+from django.contrib import admin
+from djangoapps.rpg import models
 
-# Register your models here.
+
+admin.site.register(models.Character)

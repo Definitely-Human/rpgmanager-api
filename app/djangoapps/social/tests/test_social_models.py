@@ -12,12 +12,12 @@ class SocialModelTests(TestCase):
 
     def test_profile_created_for_new_user(self):
         """Test that profile is always create for a new user."""
-        email = 'test@example.com'
-        username = 'test'
-        password = 'testpass123'
+        email = "test@example.com"
+        username = "test"
+        password = "testpass123"
         user = get_user_model().objects.create_user(
-            email=email,
-            username=username,
-            password=password
+            email=email, username=username, password=password
         )
         self.assertIsInstance(user.profile, models.Profile)
+
+        # TODO add tests to ensure user can't have 2 profiles
