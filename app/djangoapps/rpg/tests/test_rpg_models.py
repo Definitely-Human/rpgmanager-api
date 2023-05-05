@@ -6,8 +6,8 @@ from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
 
 
-class RPGModelTests(TestCase):
-    """Tests for RPG models."""
+class RPGCharacterTests(TestCase):
+    """Tests for RPG character model."""
 
     def test_create_new_character(self):
         """Test creating new character."""
