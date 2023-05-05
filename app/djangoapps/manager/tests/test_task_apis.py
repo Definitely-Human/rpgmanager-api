@@ -10,7 +10,7 @@ from rest_framework.test import APIClient
 from djangoapps.manager.models import Task
 from djangoapps.rpg.models import Character
 
-from djangoapps.manager.serializers import CharacterSerializer
+from djangoapps.manager.serializers import TaskSerializer
 
 TASK_URL = reverse("manager:task-list")
 
@@ -33,7 +33,7 @@ def create_user(
 
 def create_character(user, name="bob", **params):
     """Create and return character"""
-    return Character.objects.create(user, name, **params)
+    return Character.objects.create(user=user, name=name, **params)
 
 
 def create_task(character, **params):
@@ -78,7 +78,7 @@ class PrivateManagerTaskAPITests(TestCase):
         res = self.client.get(TASK_URL)
 
         tasks = Task.objects.all().order_by("-id")
-        serializer = CharacterSerializer(tasks, many=True)
+        serializer = TaskSerializer(tasks, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
@@ -93,7 +93,7 @@ class PrivateManagerTaskAPITests(TestCase):
         res = self.client.get(TASK_URL)
 
         tasks = Task.objects.filter(character=self.character).order_by("-id")
-        serializer = CharacterSerializer(tasks, many=True)
+        serializer = TaskSerializer(tasks, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)

@@ -13,7 +13,7 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     due_to = models.DateTimeField(null=True)
-    due_to = models.DateTimeField(null=True)
+    completion_time = models.DateTimeField(null=True)
     is_complete = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     is_favorite = models.BooleanField(default=False)
