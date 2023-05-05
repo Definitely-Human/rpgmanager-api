@@ -101,4 +101,35 @@ class PrivateRPGCharacterAPITests(TestCase):
         character = Character.objects.get(id=res.data["id"])
         for k, v in payload.items():
             self.assertEqual(getattr(character, k), v)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(self.user, character.user)
+
+    def test_create_second_character_fails(self):
+        """Test user can't create second character."""
+        Character.objects.create(user=self.user, name="Bob")
+
+        payload = {
+            "name": "Rob",
+            "character_xp": 5,
+        }
+
+        res = self.client.post(CHARACTER_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_edit_other_user_character_fails(self):
+        Character.objects.create(user=self.user, name="Bob")
+        secondUser = create_user(email="user2@example.com", username="user2")
+        originalName = "Rob"
+        secondChar = Character.objects.create(
+            user=secondUser, name=originalName
+        )
+
+        payload = {
+            "name": "Bob2",
+            "character_xp": 5,
+        }
+        res = self.client.patch(detail_url(secondChar.id), payload)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        secondChar.refresh_from_db()
+        self.assertEqual(secondChar.name, originalName)

@@ -12,3 +12,13 @@ class CharacterSerializer(serializers.ModelSerializer):
         model = Character
         fields = ["id", "name", "character_xp", "coins"]
         read_only_fields = ["id"]
+
+    def validate(self, data):
+        if (
+            Character.objects.filter(
+                user=self.context["request"].user
+            ).exists()
+            and self.context["request"].method == "POST"
+        ):
+            raise serializers.ValidationError("User already has character.")
+        return data
