@@ -10,7 +10,11 @@ from rest_framework.test import APIClient
 from djangoapps.manager.models import Task
 from djangoapps.rpg.models import Character
 
-from djangoapps.manager.serializers import TaskSerializer
+from djangoapps.manager.serializers import (
+    TaskSerializer,
+    TaskDetailSerializer,
+)
+
 
 TASK_URL = reverse("manager:task-list")
 
@@ -97,3 +101,24 @@ class PrivateManagerTaskAPITests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
+
+    def test_retrieve_task_detail(self):
+        """Tests for retrieving task details."""
+        task = create_task(character=self.character)
+
+        url = detail_url(task.id)
+        res = self.client.get(url)
+
+        serializer = TaskDetailSerializer(task)
+        self.assertEqual(res.data, serializer.data)
+
+    def test_crete_task(self):
+        """Test creating a task."""
+        payload = {"title": "Eat", "content": "Eat a lot", "is_favorite": True}
+        res = self.client.post(TASK_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        task = Task.objects.get(id=res.data["id"])
+        for k, v in payload.items():
+            self.assertEqual(getattr(task, k), v)
+        self.assertEqual(task.character, self.character)

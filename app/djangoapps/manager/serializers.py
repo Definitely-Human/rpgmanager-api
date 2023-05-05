@@ -19,3 +19,18 @@ class TaskSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "updated_at"]
+
+
+class TaskDetailSerializer(TaskSerializer):
+    """Serializer for task detail view."""
+
+    class Meta(TaskSerializer.Meta):
+        fields = TaskSerializer.Meta.fields + [
+            "content",
+            "created_at",
+            "completion_time",
+        ]
+        read_only_fields = TaskSerializer.Meta.read_only_fields + [
+            "created_at",
+            "completion_time",
+        ]

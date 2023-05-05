@@ -13,7 +13,7 @@ from djangoapps.manager import serializers
 class TaskViewSet(viewsets.ModelViewSet):
     """View for managing task APIs."""
 
-    serializer_class = serializers.TaskSerializer
+    serializer_class = serializers.TaskDetailSerializer
     queryset = Task.objects.all()
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -23,3 +23,14 @@ class TaskViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(
             character=self.request.user.character
         ).order_by("-id")
+
+    def get_serializer_class(self):
+        """Return serializer class for request."""
+        if self.action == "list":
+            return serializers.TaskSerializer
+
+        return self.serializer_class
+
+    def perform_create(self, serializer):
+        """Create new task."""
+        serializer.save(character=self.request.user.character)
