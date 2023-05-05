@@ -94,7 +94,6 @@ class PrivateRPGCharacterAPITests(TestCase):
         """Test creating a character."""
         payload = {
             "name": "Bob",
-            "character_xp": 5,
         }
 
         res = self.client.post(CHARACTER_URL, payload)
@@ -110,13 +109,13 @@ class PrivateRPGCharacterAPITests(TestCase):
 
         payload = {
             "name": "Rob",
-            "character_xp": 5,
         }
 
         res = self.client.post(CHARACTER_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_edit_other_user_character_fails(self):
+        """Test user can't edit other users character."""
         Character.objects.create(user=self.user, name="Bob")
         secondUser = create_user(email="user2@example.com", username="user2")
         originalName = "Rob"
@@ -126,10 +125,22 @@ class PrivateRPGCharacterAPITests(TestCase):
 
         payload = {
             "name": "Bob2",
-            "character_xp": 5,
         }
         res = self.client.patch(detail_url(secondChar.id), payload)
 
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         secondChar.refresh_from_db()
         self.assertEqual(secondChar.name, originalName)
+
+    def test_character_coins_and_xp_readonly(self):
+        """Test user can't change their xp and coins."""
+        character = Character.objects.create(user=self.user, name="Bob")
+
+        res = self.client.patch(detail_url(character.id), {"coins": 999})
+        res = self.client.patch(
+            detail_url(character.id), {"character_xp": 999}
+        )
+
+        character.refresh_from_db()
+        self.assertEqual(character.coins, 0)
+        self.assertEqual(character.character_xp, 0)

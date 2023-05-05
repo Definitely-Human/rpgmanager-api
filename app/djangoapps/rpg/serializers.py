@@ -11,7 +11,7 @@ class CharacterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Character
         fields = ["id", "name", "character_xp", "coins"]
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "character_xp", "coins"]
 
     def validate(self, data):
         if (
