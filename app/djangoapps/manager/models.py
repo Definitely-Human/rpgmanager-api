@@ -1,6 +1,7 @@
 """Models for manager app."""
 
 from django.db import models
+from django.conf import settings
 
 
 class Task(models.Model):
@@ -16,9 +17,23 @@ class Task(models.Model):
     is_complete = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
     is_favorite = models.BooleanField(default=False)
+    tags = models.ManyToManyField("Tag")
 
     def __str__(self):
         return f"{self.title}"
 
     class Meta:
         ordering = ["is_complete", "created_at"]
+
+
+class Tag(models.Model):
+    """Tags model for filtering."""
+
+    name = models.CharField(max_length=50)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )  # TODO Add unique together constraint to name and user
+    description = models.CharField(max_length=255, blank=True)
+
+    def __str__(self) -> str:
+        return self.name

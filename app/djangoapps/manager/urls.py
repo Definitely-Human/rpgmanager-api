@@ -13,7 +13,8 @@ from djangoapps.manager import views
 
 
 router = DefaultRouter()
-router.register("task", views.TaskViewSet)
+router.register("tasks", views.TaskViewSet)
+router.register("tags", views.TagViewSet)
 
 app_name = "manager"
 

@@ -7,7 +7,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from djangoapps.manager.models import Task
+from djangoapps.manager.models import Task, Tag
 from djangoapps.rpg.models import Character
 
 from djangoapps.manager.serializers import (
@@ -172,3 +172,98 @@ class PrivateManagerTaskAPITests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Task.objects.filter(id=task.id).exists())
+
+    def test_create_task_with_new_tags(self):
+        """Test creating task with new tags."""
+        payload = {
+            "title": "Eat",
+            "content": "Eat a lot",
+            "favorite": True,
+            "tags": [
+                {"name": "Eating", "description": "About eating"},
+                {"name": "Health"},
+            ],
+        }
+        res = self.client.post(TASK_URL, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        tasks = Task.objects.filter(character=self.character)
+        self.assertEqual(tasks.count(), 1)
+        task = tasks[0]
+        self.assertEqual(task.tags.count(), 2)
+        for tag in payload["tags"]:
+            exists = task.tags.filter(
+                name=tag["name"],
+                user=self.user,
+            ).exists()
+            self.assertTrue(exists)
+
+    def test_creating_task_with_existing_tags(self):
+        """Test creating task with existing tags."""
+        tag_eat = Tag.objects.create(
+            user=self.user, name="Eating", description="About eating."
+        )
+        payload = {
+            "title": "Eat",
+            "content": "Eat a lot",
+            "favorite": True,
+            "tags": [{"name": "Eating"}, {"name": "Health"}],
+        }
+        res = self.client.post(TASK_URL, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        tasks = Task.objects.filter(character=self.character)
+        self.assertEqual(tasks.count(), 1)
+        task = tasks[0]
+        self.assertEqual(task.tags.count(), 2)
+        self.assertIn(tag_eat, task.tags.all())
+        for tag in payload["tags"]:
+            exists = task.tags.filter(
+                name=tag["name"],
+                user=self.user,
+            ).exists()
+            self.assertTrue(exists)
+
+    def test_creating_tag_when_updating_recipe(self):
+        """Test creating tags on task update."""
+        task = create_task(character=self.character)
+
+        payload = {
+            "tags": [{"name": "Eating"}, {"name": "Health"}],
+        }
+        url = detail_url(task.id)
+        res = self.client.patch(url, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        eat_tag = Tag.objects.get(user=self.user, name="Eating")
+        health_tag = Tag.objects.get(user=self.user, name="Health")
+        self.assertIn(eat_tag, task.tags.all())
+        self.assertIn(health_tag, task.tags.all())
+
+    def test_update_task_assign_tag(self):
+        """Test assigning an existing tags when updating task."""
+        tag_eat = Tag.objects.create(user=self.user, name="Eating")
+        task = create_task(character=self.character)
+        task.tags.add(tag_eat)
+
+        tag_health = Tag.objects.create(user=self.user, name="Health")
+        payload = {"tags": [{"name": "Health"}]}
+        url = detail_url(task.id)
+        res = self.client.patch(url, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn(tag_health, task.tags.all())
+        self.assertNotIn(tag_eat, task.tags.all())
+
+    def test_clear_task_tags(self):
+        """Test clearing task tags."""
+        tag = Tag.objects.create(user=self.user, name="Eating")
+        task = create_task(character=self.character)
+        task.tags.add(tag)
+
+        payload = {"tags": []}
+        url = detail_url(task.id)
+        res = self.client.patch(url, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(task.tags.count(), 0)
