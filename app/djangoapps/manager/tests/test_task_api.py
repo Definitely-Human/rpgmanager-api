@@ -179,7 +179,10 @@ class PrivateManagerTaskAPITests(TestCase):
             "title": "Eat",
             "content": "Eat a lot",
             "favorite": True,
-            "tags": [{"name": "Eating"}, {"name": "Health"}],
+            "tags": [
+                {"name": "Eating", "description": "About eating"},
+                {"name": "Health"},
+            ],
         }
         res = self.client.post(TASK_URL, payload, format="json")
 
@@ -197,7 +200,9 @@ class PrivateManagerTaskAPITests(TestCase):
 
     def test_creating_task_with_existing_tags(self):
         """Test creating task with existing tags."""
-        tag_eat = Tag.objects.create(user=self.user, name="Eating")
+        tag_eat = Tag.objects.create(
+            user=self.user, name="Eating", description="About eating."
+        )
         payload = {
             "title": "Eat",
             "content": "Eat a lot",
