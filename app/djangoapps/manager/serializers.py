@@ -2,7 +2,19 @@
 
 from rest_framework import serializers
 
-from djangoapps.manager.models import Task
+from djangoapps.manager.models import (
+    Task,
+    Tag,
+)
+
+
+class TagSerializer(serializers.ModelSerializer):
+    """Serializer for tags."""
+
+    class Meta:
+        model = Tag
+        fields = ["id", "name", "description"]
+        read_only_fields = ["id"]
 
 
 class TaskSerializer(serializers.ModelSerializer):

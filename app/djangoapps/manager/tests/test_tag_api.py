@@ -16,6 +16,11 @@ from djangoapps.manager.serializers import TagSerializer
 TAGS_URL = reverse("manager:tag-list")
 
 
+def detail_url(tag_id):
+    """Get tag detail URL."""
+    return reverse("manager:tag-detail", args=[tag_id])
+
+
 def create_user(
     email="user@example.com",
     password="testpass123",
@@ -54,9 +59,9 @@ class PrivateTagsAPITests(TestCase):
 
     def test_get_tags_list(self):
         """Test getting a list of tags."""
-        Tag.objects.create(self.user)
+        Tag.objects.create(user=self.user)
         Tag.objects.create(
-            self.user, name="Training", description="About training."
+            user=self.user, name="Training", description="About training."
         )
 
         res = self.client.get(TAGS_URL)
@@ -79,3 +84,26 @@ class PrivateTagsAPITests(TestCase):
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]["name"], tag.name)
         self.assertEqual(res.data[0]["id"], tag.id)
+
+    def test_update_tag(self):
+        """Test updating a tag."""
+        tag = create_tag(self.user)
+
+        payload = {"name": "Training"}
+        url = detail_url(tag.id)
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        tag.refresh_from_db()
+        self.assertEqual(tag.name, payload["name"])
+
+    def test_delete_tag(self):
+        """Test deleting a tag."""
+        tag = create_tag(self.user)
+
+        url = detail_url(tag.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        tags = Tag.objects.filter(user=self.user)
+        self.assertFalse(tags.exists())

@@ -7,7 +7,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from djangoapps.manager.models import Task
+from djangoapps.manager.models import Task, Tag
 from djangoapps.rpg.models import Character
 
 from djangoapps.manager.serializers import (
@@ -172,3 +172,49 @@ class PrivateManagerTaskAPITests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Task.objects.filter(id=task.id).exists())
+
+    def test_create_task_with_new_tags(self):
+        """Test creating task with new tags."""
+        payload = {
+            "title": "Eat",
+            "content": "Eat a lot",
+            "favorite": True,
+            "tags": [{"name": "Eating"}, {"name": "Health"}],
+        }
+        res = self.client.post(TASK_URL, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        tasks = Task.objects.filter(character=self.character)
+        self.assertEqual(tasks.count(), 1)
+        task = tasks[0]
+        self.assertEqual(task.tags.count(), 2)
+        for tag in payload["tags"]:
+            exists = task.tags.filter(
+                name=tag["name"],
+                user=self.user,
+            ).exists()
+            self.assertTrue(exists)
+
+    def test_creating_task_with_existing_tags(self):
+        """Test creating task with existing tags."""
+        tag_eat = Tag.objects.create(user=self.user, name="Eating")
+        payload = {
+            "title": "Eat",
+            "content": "Eat a lot",
+            "favorite": True,
+            "tags": [{"name": "Eating"}, {"name": "Health"}],
+        }
+        res = self.client.post(TASK_URL, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        tasks = Task.objects.filter(character=self.character)
+        self.assertEqual(tasks.count(), 1)
+        task = tasks[0]
+        self.assertEqual(task.tags.count(), 2)
+        self.assertIn(tag_eat, task.tags.all())
+        for tag in payload["tags"]:
+            exists = task.tags.filter(
+                name=tag["name"],
+                user=self.user,
+            ).exists()
+            self.assertTrue(exists)

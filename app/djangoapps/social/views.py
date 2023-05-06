@@ -12,7 +12,9 @@ from djangoapps.social.models import Profile
 from djangoapps.social import serializers
 
 
-class ProfileViewSet(viewsets.ViewSet):
+class ProfileViewSet(
+    viewsets.ViewSet
+):  # TODO Change this to GenericViewSet and mixins
     """View for manage profile APIs."""
 
     queryset = Profile.objects.all()
