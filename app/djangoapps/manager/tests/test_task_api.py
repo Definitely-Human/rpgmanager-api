@@ -223,3 +223,47 @@ class PrivateManagerTaskAPITests(TestCase):
                 user=self.user,
             ).exists()
             self.assertTrue(exists)
+
+    def test_creating_tag_when_updating_recipe(self):
+        """Test creating tags on task update."""
+        task = create_task(character=self.character)
+
+        payload = {
+            "tags": [{"name": "Eating"}, {"name": "Health"}],
+        }
+        url = detail_url(task.id)
+        res = self.client.patch(url, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        eat_tag = Tag.objects.get(user=self.user, name="Eating")
+        health_tag = Tag.objects.get(user=self.user, name="Health")
+        self.assertIn(eat_tag, task.tags.all())
+        self.assertIn(health_tag, task.tags.all())
+
+    def test_update_task_assign_tag(self):
+        """Test assigning an existing tags when updating task."""
+        tag_eat = Tag.objects.create(user=self.user, name="Eating")
+        task = create_task(character=self.character)
+        task.tags.add(tag_eat)
+
+        tag_health = Tag.objects.create(user=self.user, name="Health")
+        payload = {"tags": [{"name": "Health"}]}
+        url = detail_url(task.id)
+        res = self.client.patch(url, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn(tag_health, task.tags.all())
+        self.assertNotIn(tag_eat, task.tags.all())
+
+    def test_clear_task_tags(self):
+        """Test clearing task tags."""
+        tag = Tag.objects.create(user=self.user, name="Eating")
+        task = create_task(character=self.character)
+        task.tags.add(tag)
+
+        payload = {"tags": []}
+        url = detail_url(task.id)
+        res = self.client.patch(url, payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(task.tags.count(), 0)

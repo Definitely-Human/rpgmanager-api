@@ -35,10 +35,8 @@ class TaskSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "updated_at"]
 
-    def create(self, validated_data):
-        """Create new task."""
-        tags = validated_data.pop("tags", [])
-        task = Task.objects.create(**validated_data)
+    def _get_or_create_tags(self, tags, task):
+        """Handle getting or creating tags as needed."""
         auth_user = self.context["request"].user
 
         for tag in tags:
@@ -48,7 +46,26 @@ class TaskSerializer(serializers.ModelSerializer):
             )
             task.tags.add(tag_obj)
 
+    def create(self, validated_data):
+        """Create new task."""
+        tags = validated_data.pop("tags", [])
+        task = Task.objects.create(**validated_data)
+        self._get_or_create_tags(tags, task)
+
         return task
+
+    def update(self, instance, validated_data):
+        """Update task."""
+        tags = validated_data.pop("tags", None)
+        if tags is not None:
+            instance.tags.clear()
+            self._get_or_create_tags(tags, instance)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
 
 
 class TaskDetailSerializer(TaskSerializer):
