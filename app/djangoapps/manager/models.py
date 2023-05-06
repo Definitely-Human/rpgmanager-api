@@ -37,3 +37,23 @@ class Tag(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class Category(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="categories",
+    )
+    name = models.CharField(max_length=50)
+    subcategory_of = models.ForeignKey(
+        "self", on_delete=models.CASCADE, null=True
+    )
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+        ordering = ["name"]
