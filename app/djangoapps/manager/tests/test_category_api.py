@@ -45,7 +45,7 @@ class PublicCategoryAPITests(TestCase):
         """Test authentication is required to access category API."""
         res = self.client.get(CATEGORY_URL)
 
-        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHENTICATED)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class PrivateCategoryAPITests(TestCase):

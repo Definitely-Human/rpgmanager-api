@@ -5,6 +5,7 @@ from rest_framework import serializers
 from djangoapps.manager.models import (
     Task,
     Tag,
+    Category,
 )
 
 
@@ -80,4 +81,19 @@ class TaskDetailSerializer(TaskSerializer):
         read_only_fields = TaskSerializer.Meta.read_only_fields + [
             "created_at",
             "completion_time",
+        ]
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    """Serializer for category."""
+
+    class Meta:
+        model = Category
+        fields = [
+            "id",
+            "name",
+            "subcategory_of",
+        ]
+        read_only_fields = [
+            "id",
         ]
