@@ -12,6 +12,13 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
+import sys
+import logging
+
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    logger = logging.getLogger("main")
+    logger.warning("Warning! Logging is disabled during tests in settings.py!")
+    logging.disable(logging.CRITICAL)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -142,4 +149,30 @@ AUTH_USER_MODEL = "core.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "console_formatter": {
+            "format": "[LOG] [{asctime}] - {levelname} - {module} - {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "console_formatter",
+        },
+    },
+    "loggers": {
+        "main": {
+            "handlers": [
+                "console",
+            ],
+            "propagate": True,
+            "level": "INFO",
+        }
+    },
 }

@@ -10,9 +10,7 @@ from django.db.utils import OperationalError
 from django.test import SimpleTestCase
 
 
-@patch(
-    "djangoapps.core.management.commands.wait_for_db.Command.check"
-)  # TODO Add mocking so that wait_for_db does not write to console in tests
+@patch("djangoapps.core.management.commands.wait_for_db.Command.check")
 class CommandTest(SimpleTestCase):
     """Test commands"""
 
