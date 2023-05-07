@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from djangoapps.manager.models import (
     Task,
     Tag,
+    Category,
 )
 from djangoapps.manager import serializers
 
@@ -53,4 +54,21 @@ class TagViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Create new tag."""
+        serializer.save(user=self.request.user)
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    """View for managing category APIs."""
+
+    serializer_class = serializers.CategorySerializer
+    queryset = Category.objects.all()
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Retrieve categories for authenticated user."""
+        return self.queryset.filter(user=self.request.user).order_by("name")
+
+    def perform_create(self, serializer):
+        """Create new category."""
         serializer.save(user=self.request.user)

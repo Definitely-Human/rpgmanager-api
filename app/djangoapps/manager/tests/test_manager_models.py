@@ -4,6 +4,7 @@ from django.test import TestCase
 from djangoapps.manager.models import (
     Task,
     Tag,
+    Category,
 )
 from djangoapps.rpg.models import Character
 from django.contrib.auth import get_user_model
@@ -42,3 +43,14 @@ class ManagerTagTests(TestCase):
         tag = Tag.objects.create(user=user, name="Eating")
 
         self.assertEqual(str(tag), tag.name)
+
+
+class ManagerCategoryTests(TestCase):
+    """Tests for manager category model."""
+
+    def test_create_new_category(self):
+        """Test creating new category is successful."""
+        user = create_user()
+        category = Category.objects.create(user=user, name="Eating")
+
+        self.assertEqual(str(category), category.name)

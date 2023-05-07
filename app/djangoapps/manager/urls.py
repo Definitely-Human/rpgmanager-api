@@ -15,6 +15,7 @@ from djangoapps.manager import views
 router = DefaultRouter()
 router.register("tasks", views.TaskViewSet)
 router.register("tags", views.TagViewSet)
+router.register("categories", views.CategoryViewSet)
 
 app_name = "manager"
 
