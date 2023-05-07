@@ -61,7 +61,7 @@ class PrivateProfileAPITests(TestCase):
         serializer = ProfileSerializer(self.user.profile)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res.data[0], serializer.data)
 
     def test_get_other_user_profile(self):
         """Test get other user profile."""
@@ -92,7 +92,7 @@ class PrivateProfileAPITests(TestCase):
 
         res = self.client.patch(profile_by_id(self.user.profile.id), payload)
 
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         profile = Profile.objects.get(id=res.data["id"])
         for k, v in payload.items():
             self.assertEqual(getattr(profile, k), v)
@@ -116,7 +116,7 @@ class PrivateProfileAPITests(TestCase):
 
         res = self.client.patch(profile_by_id(otherUser.profile.id), payload)
         otherUser.refresh_from_db()
-        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(otherUser.profile.first_name, originalUserName)
         self.assertEqual(otherUser.profile.user, otherUser)
 

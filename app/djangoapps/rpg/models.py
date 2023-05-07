@@ -2,8 +2,6 @@
 
 from django.db import models
 from django.conf import settings
-from django.utils import timezone
-from django.core.validators import MinValueValidator
 
 
 class Character(models.Model):
@@ -14,16 +12,13 @@ class Character(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
-    character_xp = models.IntegerField(
-        validators=[
-            MinValueValidator
-        ],  # TODO change to PositiveBigIntegerField
+    character_xp = models.PositiveIntegerField(
         default=0,
     )
     coins = models.IntegerField(default=0)
     created_at = models.DateTimeField(
-        default=timezone.now
-    )  # TODO change default to auto_now_add
+        auto_now_add=True,
+    )
 
     def __str__(self) -> str:
         return self.name
