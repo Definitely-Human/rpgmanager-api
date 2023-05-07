@@ -1,6 +1,5 @@
 from django.contrib import admin
 from djangoapps.manager import models
-from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 

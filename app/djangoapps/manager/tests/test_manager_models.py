@@ -48,7 +48,7 @@ class ManagerTagTests(TestCase):
         self.assertEqual(str(tag), tag.name)
 
     def test_user_can_not_create_tags_with_same_name(self):
-        tag = Tag.objects.create(user=self.user, name="Eating")
+        Tag.objects.create(user=self.user, name="Eating")
 
         self.assertRaises(
             IntegrityError,
