@@ -81,3 +81,26 @@ class PrivateCategoryAPITests(TestCase):
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]["name"], category.name)
         self.assertEqual(res.data[0]["id"], category.id)
+
+    def test_update_category(self):
+        """Test updating a category."""
+        category = create_category(self.user)
+
+        payload = {"name": "Training"}
+        url = detail_url(category.id)
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        category.refresh_from_db()
+        self.assertEqual(category.name, payload["name"])
+
+    def test_delete_category(self):
+        """Test deleting a category."""
+        category = create_category(self.user)
+
+        url = detail_url(category.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        categories = Category.objects.filter(user=self.user)
+        self.assertFalse(categories.exists())
