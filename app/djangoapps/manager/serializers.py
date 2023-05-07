@@ -33,6 +33,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "due_to",
             "updated_at",
             "tags",
+            "category",
         ]
         read_only_fields = ["id", "updated_at"]
 

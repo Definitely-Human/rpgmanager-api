@@ -18,6 +18,9 @@ class Task(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_favorite = models.BooleanField(default=False)
     tags = models.ManyToManyField("Tag")
+    category = models.ForeignKey(
+        "Category", on_delete=models.RESTRICT, null=True
+    )
 
     def __str__(self):
         return f"{self.title}"
