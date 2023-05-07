@@ -41,6 +41,14 @@ class Tag(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    class Meta:
+        unique_together = [
+            [
+                "user",
+                "name",
+            ],
+        ]
+
 
 class Category(models.Model):
     user = models.ForeignKey(
