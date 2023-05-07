@@ -10,37 +10,45 @@ from djangoapps.core import models as coreModels
 
 class UserAdmin(BaseUserAdmin):
     """Define the admin pages for users."""
-    ordering = ['id']
-    list_display = ['email', 'username']
+
+    ordering = ["id"]
+    list_display = ["email", "username"]
     fieldsets = (
-        (None, {'fields': ('email', 'username', 'password')}),
+        (None, {"fields": ("email", "username", "password")}),
         (
-            _('Permissions'),
+            _("Permissions"),
             {
-                'fields': (
-                    'is_active',
-                    'is_staff',
-                    'is_superuser',
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
                 )
-            }
+            },
         ),
-        (_("Important dates"), {'fields': ('last_login', 'date_joined')}),
+        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
-    readonly_fields = ['last_login', 'date_joined']
+    readonly_fields = ["last_login", "date_joined"]
     add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': (
-                'email',
-                'username',
-                'password1',
-                'password2',
-                'is_active',
-                'is_staff',
-                'is_superuser',
-            )
-        }),
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "email",
+                    "username",
+                    "password1",
+                    "password2",
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                ),
+            },
+        ),
     )
 
 
 admin.site.register(coreModels.User, UserAdmin)
+
+
+admin.site.site_title = "RPG Manager Admin"
+admin.site.site_header = "RPG Manager Admin"

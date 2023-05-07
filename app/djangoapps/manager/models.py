@@ -32,10 +32,10 @@ class Task(models.Model):
 class Tag(models.Model):
     """Tags model for filtering."""
 
-    name = models.CharField(max_length=50)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE
-    )  # TODO Add unique together constraint to name and user
+    )
+    name = models.CharField(max_length=50)
     description = models.CharField(max_length=255, blank=True)
 
     def __str__(self) -> str:
