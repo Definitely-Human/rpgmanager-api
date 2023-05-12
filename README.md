@@ -42,6 +42,10 @@ The database schema for this project is:
 
 ![alt text](https://i.imgur.com/0Jf1ch7.png)
 
+### Docs with Swagger and DRF Spectacular
+
+Documentation for the API is automatically generated with DRF Spectacular and displayed with Swagger.
+
 ## Installation
 
 1. Clone this project.
