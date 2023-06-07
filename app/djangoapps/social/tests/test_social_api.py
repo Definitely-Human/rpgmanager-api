@@ -12,8 +12,18 @@ from rest_framework.test import APIClient
 from djangoapps.social.models import Profile
 from djangoapps.social.serializers import ProfileSerializer
 
+import tempfile
+import os
+
+from PIL import Image
+
 
 OWN_PROFILE_URL = reverse("social:profile-list")
+
+
+def image_upload_url(profile_id):
+    """Create and return image upload URL."""
+    return reverse("social:profile-upload-image", args=[profile_id])
 
 
 def profile_by_id(profile_id):
@@ -152,3 +162,43 @@ class PrivateProfileAPITests(TestCase):
 
         profile.refresh_from_db()
         self.assertEqual(self.user.profile, profile)
+
+
+class ProfileImageUploadTests(TestCase):
+    """Tests for profile image upload API."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_user(
+            email="user@example.com",
+            password="testpass123",
+            username="testuser",
+        )
+        self.profile = self.user.profile
+        self.client.force_authenticate(self.user)
+
+    def tearDown(self) -> None:
+        self.profile.image.delete()
+
+    def test_upload_image(self):
+        """Test uploading image to profile."""
+        url = image_upload_url(self.profile.id)
+        with tempfile.NamedTemporaryFile(suffix=".jpg") as image_file:
+            img = Image.new("RGB", (10, 10))
+            img.save(image_file, format="JPEG")
+            image_file.seek(0)
+            payload = {"image": image_file}
+            res = self.client.post(url, payload, format="multipart")
+
+        self.profile.refresh_from_db()
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn("image", res.data)
+        self.assertTrue(os.path.exists(self.profile.image.path))
+
+    def test_upload_image_bad_request(self):
+        """Test uploading invalid image."""
+        url = image_upload_url(self.profile.id)
+        payload = {"image": "no_image"}
+        res = self.client.post(url, payload, format="multipart")
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
