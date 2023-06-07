@@ -11,5 +11,22 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ["id", "is_online", "first_name", "last_name", "about_me"]
+        fields = [
+            "id",
+            "is_online",
+            "first_name",
+            "last_name",
+            "about_me",
+            "image",
+        ]
+        read_only_fields = ["id", "is_online", "image"]
+
+
+class ProfileImageSerializer(serializers.ModelSerializer):
+    """Serializer for uploading profile images."""
+
+    class Meta:
+        model = Profile
+        fields = ["id", "image"]
         read_only_fields = ["id"]
+        extra_kwargs = {"image": {"required": "True"}}
